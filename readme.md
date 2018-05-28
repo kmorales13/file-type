@@ -4,6 +4,8 @@
 
 The file type is detected by checking the [magic number](http://en.wikipedia.org/wiki/Magic_number_(programming)#Magic_numbers_in_files) of the buffer.
 
+#### Fork
+[CFB](https://github.com/SheetJS/js-cfb) was added as a dependency, allowing to read OLE files' subfiles to determine its file type.
 
 ## Install
 
