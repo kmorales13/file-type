@@ -152,6 +152,9 @@ It only needs the first 4100 bytes.
 - [`docx`](https://en.wikipedia.org/wiki/Office_Open_XML)
 - [`pptx`](https://en.wikipedia.org/wiki/Office_Open_XML)
 - [`xlsx`](https://en.wikipedia.org/wiki/Office_Open_XML)
+- [`doc`](https://whatis.techtarget.com/fileformat/DOC-Microsoft-Word-document)
+- [`ppt`](https://whatis.techtarget.com/fileformat/PPT-PowerPoint-presentation-Microsoft)
+- [`xls`](https://whatis.techtarget.com/fileformat/XLS-Worksheet-file-Microsoft-Excel)
 - [`3gp`](https://en.wikipedia.org/wiki/3GP_and_3G2)
 - [`jp2`](https://en.wikipedia.org/wiki/JPEG_2000) - JPEG 2000
 - [`jpm`](https://en.wikipedia.org/wiki/JPEG_2000) - JPEG 2000
