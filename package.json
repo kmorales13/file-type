@@ -115,6 +115,9 @@
 		"xml",
 		"heic"
 	],
+	"dependencies": {
+		"cfb": "^1.7.0"
+	},
 	"devDependencies": {
 		"ava": "*",
 		"read-chunk": "^2.0.0",

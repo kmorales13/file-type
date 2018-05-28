@@ -1,11 +1,14 @@
 'use strict';
-const toBytes = s => [...s].map(c => c.charCodeAt(0));
+
+var CFB = require('cfb');
+
+const toBytes = s => Array.from(s).map(c => c.charCodeAt(0));
 const xpiZipFilename = toBytes('META-INF/mozilla.rsa');
 const oxmlContentTypes = toBytes('[Content_Types].xml');
 const oxmlRels = toBytes('_rels/.rels');
 
 module.exports = input => {
-	const buf = input instanceof Uint8Array ? input : new Uint8Array(input);
+	const buf = (input instanceof Uint8Array) ? input : new Uint8Array(input);
 
 	if (!(buf && buf.length > 1)) {
 		return null;
@@ -278,7 +281,7 @@ module.exports = input => {
 
 		if (idPos !== -1) {
 			const docTypePos = idPos + 3;
-			const findDocType = type => [...type].every((c, i) => sliced[docTypePos + i] === c.charCodeAt(0));
+			const findDocType = type => Array.from(type).every((c, i) => sliced[docTypePos + i] === c.charCodeAt(0));
 
 			if (findDocType('matroska')) {
 				return {
@@ -307,27 +310,14 @@ module.exports = input => {
 		};
 	}
 
-	// RIFF file format which might be AVI, WAV, QCP, etc
-	if (check([0x52, 0x49, 0x46, 0x46])) {
-		if (check([0x41, 0x56, 0x49], {offset: 8})) {
-			return {
-				ext: 'avi',
-				mime: 'video/x-msvideo'
-			};
-		}
-		if (check([0x57, 0x41, 0x56, 0x45], {offset: 8})) {
-			return {
-				ext: 'wav',
-				mime: 'audio/x-wav'
-			};
-		}
-		// QLCM, QCP file
-		if (check([0x51, 0x4C, 0x43, 0x4D], {offset: 8})) {
-			return {
-				ext: 'qcp',
-				mime: 'audio/qcelp'
-			};
-		}
+	if (
+		check([0x52, 0x49, 0x46, 0x46]) &&
+		check([0x41, 0x56, 0x49], {offset: 8})
+	) {
+		return {
+			ext: 'avi',
+			mime: 'video/x-msvideo'
+		};
 	}
 
 	if (check([0x30, 0x26, 0xB2, 0x75, 0x8E, 0x66, 0xCF, 0x11, 0xA6, 0xD9])) {
@@ -371,24 +361,6 @@ module.exports = input => {
 		) {
 			return {
 				ext: 'mp2',
-				mime: 'audio/mpeg'
-			};
-		}
-
-		if (
-			check([0xFF, 0xF8], {offset: start, mask: [0xFF, 0xFC]}) // MPEG 2 layer 0 using ADTS
-		) {
-			return {
-				ext: 'mp2',
-				mime: 'audio/mpeg'
-			};
-		}
-
-		if (
-			check([0xFF, 0xF0], {offset: start, mask: [0xFF, 0xFC]}) // MPEG 4 layer 0 using ADTS
-		) {
-			return {
-				ext: 'mp4',
 				mime: 'audio/mpeg'
 			};
 		}
@@ -465,6 +437,16 @@ module.exports = input => {
 		return {
 			ext: 'flac',
 			mime: 'audio/x-flac'
+		};
+	}
+
+	if (
+		check([0x52, 0x49, 0x46, 0x46]) &&
+		check([0x57, 0x41, 0x56, 0x45], {offset: 8})
+	) {
+		return {
+			ext: 'wav',
+			mime: 'audio/x-wav'
 		};
 	}
 
@@ -574,13 +556,6 @@ module.exports = input => {
 		};
 	}
 
-	if (check([0x00, 0x00, 0x02, 0x00])) {
-		return {
-			ext: 'cur',
-			mime: 'image/x-icon'
-		};
-	}
-
 	if (check([0x46, 0x4C, 0x56, 0x01])) {
 		return {
 			ext: 'flv',
@@ -672,7 +647,25 @@ module.exports = input => {
 		};
 	}
 
+	// https://github.com/SheetJS/js-cfb/blob/master/test.js#L47
 	if (check([0xD0, 0xCF, 0x11, 0xE0, 0xA1, 0xB1, 0x1A, 0xE1])) {
+    var cfb = CFB.parse(buf);
+    if (CFB.find(cfb, 'PowerPoint Document'))
+      return {
+        ext: 'ppt',
+        mime: 'application/vnd.ms-powerpoint'
+      }
+    if (CFB.find(cfb, 'WordDocument') && CFB.find(cfb, 'Word Document'))
+      return {
+        ext: 'doc',
+        mime: 'application/msword'
+      }
+    if (CFB.find(cfb, 'Workbook') && CFB.find(cfb, 'Book'))
+      return {
+        ext: 'xls',
+        mime: 'application/vnd.ms-excel'
+      }
+
 		return {
 			ext: 'msi',
 			mime: 'application/x-msi'
